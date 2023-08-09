@@ -8,6 +8,14 @@ const routes = [
     name: 'Home',
     component: Home
   }, {
+    path: '/register',
+    name: 'Register',
+    component: () => import('../views/register/Register'),
+    beforeEnter (to, from, next) {
+      const { isLogin } = localStorage
+      isLogin ? next({ name: 'Home' }) : next()
+    }
+  }, {
     path: '/login',
     name: 'Login',
     component: () => import('../views/login/Login'),
@@ -31,7 +39,9 @@ const router = createRouter({
   routes
 })
 router.beforeEach((to, from, next) => {
-  const { isLogin } = localStorage;
-  (isLogin || to.name === 'Login') ? next() : next({ name: 'Login' })
+  const { isLogin } = localStorage
+  const { name } = to
+  const isLoginOrRegister = (name === 'Login' || name === 'Register');
+  (isLogin || isLoginOrRegister) ? next() : next({ name: 'Login' })
 })
 export default router
