@@ -1,27 +1,40 @@
 <template>
     <div class="wrapper">
-        <img class="wrapper__img" src="http://www.dell-lee.com/imgs/vue3/user.png" >
-        <div class="wrapper__input">
-            <input class="wrapper__input__content" v-model="data.username" placeholder="请输入用户名">
-        </div>
-        <div class="wrapper__input">
-            <input class="wrapper__input__content" v-model="data.password" placeholder="请输入密码" type="password">
-        </div>
-        <div class="wrapper__login-button" @click="handleLogin">登陆</div>
-        <div class="wrapper__login-link" @click="handleRegisterClick">立即注册</div>
+      <img class="wrapper__img" src="http://www.dell-lee.com/imgs/vue3/user.png" >
+      <div class="wrapper__input">
+          <input class="wrapper__input__content" v-model="data.username" placeholder="请输入用户名">
+      </div>
+      <div class="wrapper__input">
+          <input class="wrapper__input__content" v-model="data.password" placeholder="请输入密码" type="password">
+      </div>
+      <div class="wrapper__login-button" @click="handleLogin">登陆</div>
+      <div class="wrapper__login-link" @click="handleRegisterClick">立即注册</div>
+      <Toast v-if="data.showToast" :message="data.toastMessage" />
     </div>
 </template>
 <script>
 import { useRouter } from 'vue-router'
 import { post } from '../../utils/request'
 import { reactive } from 'vue'
+import Toast from '../../components/Toast'
 export default {
   name: 'Login',
+  components: { Toast },
   setup () {
     const data = reactive({
       username: '',
-      password: ''
+      password: '',
+      showToast: false,
+      toastMessage: ''
     })
+    const showToast = (message) => {
+      data.showToast = true
+      data.toastMessage = message
+      setTimeout(() => {
+        data.showToast = false
+        data.toastMessage = ''
+      }, 2000)
+    }
     const router = useRouter()
     const handleLogin = async () => {
       try {
@@ -34,10 +47,10 @@ export default {
           localStorage.isLogin = true
           router.push({ name: 'Home' })
         } else {
-          alert('登陆失败')
+          showToast('登陆失败')
         }
       } catch (error) {
-        alert('请求失败')
+        showToast('请求失败')
       }
     }
     const handleRegisterClick = () => {
