@@ -16,5 +16,6 @@ export default {
     background: rgba(0, 0, 0, .35);
     border-radius: .05rem;
     color: #fff;
+    border: 1px solid red;
 }
 </style>
