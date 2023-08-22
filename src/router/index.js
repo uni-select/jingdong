@@ -16,7 +16,7 @@ const routes = [
       isLogin ? next({ name: 'Home' }) : next()
     }
   }, {
-    path: '/shop',
+    path: '/shop/:id',
     name: 'Shop',
     component: () => import(/* webpackChunkName: "Shop" */'../views/shop/Shop')
   }, {
