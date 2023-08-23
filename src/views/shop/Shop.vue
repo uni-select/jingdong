@@ -38,7 +38,7 @@ const useBackRouterEffect = () => {
   return { handleBackClick }
 }
 export default {
-  name: 'shop',
+  name: 'Shop',
   components: { ShopInfoVue, Content },
   setup () {
     const { item, getItemData } = useShopInfoEffect()
