@@ -9,6 +9,7 @@
     </div>
     <ShopInfoVue :item="item" :hideBorder="true" v-show="item.imgUrl"/>
     <Content />
+    <Chat />
   </div>
 </template>
 <script>
@@ -17,6 +18,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { get } from '@/utils/request'
 import ShopInfoVue from '@/components/ShopInfo'
 import Content from './Content'
+import Chat from './Chat'
 // 商品详情页请求数据
 const useShopInfoEffect = () => {
   const route = useRoute()
@@ -39,7 +41,7 @@ const useBackRouterEffect = () => {
 }
 export default {
   name: 'Shop',
-  components: { ShopInfoVue, Content },
+  components: { ShopInfoVue, Content, Chat },
   setup () {
     const { item, getItemData } = useShopInfoEffect()
     const { handleBackClick } = useBackRouterEffect()
