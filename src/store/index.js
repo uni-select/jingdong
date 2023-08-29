@@ -2,8 +2,30 @@ import Vuex from 'vuex'
 
 export default Vuex.createStore({
   state: {
+    cartList: {
+      // 第一层是商铺的id
+      // shopId: {
+      //   // 第二层是商铺id
+      //   productId: {
+      //     count: 2
+      //   }
+      // }
+    }
   },
   mutations: {
+    addItemToCard (state, payload) {
+      const { shopId, productId, productInfo } = payload
+      let shopInfo = state.cartList[shopId]
+      if (!shopInfo) { shopInfo = {} }
+      let product = shopInfo[productId]
+      if (!product) {
+        product = productInfo
+        product.count = 0
+      }
+      product.count += 1
+      shopInfo[productId] = product
+      state.cartList[shopId] = shopInfo
+    }
   },
   actions: {
   },

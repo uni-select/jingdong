@@ -21,8 +21,9 @@
           </p>
         </div>
         <div class="product__number">
-          <span class="product__number__minus">-</span> 1
-          <span class="product__number__plus">+</span>
+          <span class="product__number__minus">-</span>
+          {{ cartList?.[shopId]?.[item._id]?.count || 0 }}
+          <span class="product__number__plus" @click="addItemToCard(shopId, item._id, item)">+</span>
         </div>
       </div>
     </div>
@@ -31,6 +32,7 @@
 <script>
 import { reactive, ref, toRefs, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
+import { useStore } from 'vuex'
 import { get } from '@/utils/request'
 const categories = [
   { name: '全部商品', tab: 'all' },
@@ -46,9 +48,7 @@ const useTabEffect = () => {
   return { currentTab, handleTabClick }
 }
 // 列表内容相关逻辑
-const useCurrentListEffect = (currentTab) => {
-  const route = useRoute()
-  const shopId = route.params.id
+const useCurrentListEffect = (currentTab, shopId) => {
   const content = reactive({ list: [] })
   const getContentData = async () => {
     const result = await get(`/api/shop/${shopId}/products`, {
@@ -62,12 +62,26 @@ const useCurrentListEffect = (currentTab) => {
   const { list } = toRefs(content)
   return { list }
 }
+// 购物车相关逻辑
+const useCartEffect = () => {
+  const store = useStore()
+  const { cartList } = toRefs(store.state)
+  const addItemToCard = (shopId, productId, productInfo) => {
+    store.commit('addItemToCard', {
+      shopId, productId, productInfo
+    })
+  }
+  return { cartList, addItemToCard }
+}
 export default {
   name: 'Content',
   setup () {
+    const route = useRoute()
+    const shopId = route.params.id
     const { currentTab, handleTabClick } = useTabEffect()
-    const { list } = useCurrentListEffect(currentTab)
-    return { categories, list, currentTab, handleTabClick }
+    const { list } = useCurrentListEffect(currentTab, shopId)
+    const { cartList, addItemToCard } = useCartEffect()
+    return { categories, list, currentTab, handleTabClick, cartList, shopId, addItemToCard }
   }
 }
 </script>
