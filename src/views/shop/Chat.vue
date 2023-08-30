@@ -3,17 +3,55 @@
     <div class="check">
       <div class="check__icon">
         <img src="http://www.dell-lee.com/imgs/vue3/basket.png" class="check__icon__img">
-        <div class="check__icon__tag">1</div>
+        <div class="check__icon__tag">{{total}}</div>
       </div>
       <div class="check__info">
-        总计：<span class="check__info__price">&yen;127</span>
+        总计：<span class="check__info__price">&yen; {{price}}</span>
       </div>
       <div class="check__btn">去结算</div>
     </div>
   </div>
 </template>
 <script>
+import { computed } from 'vue'
+import { useStore } from 'vuex'
+import { useRoute } from 'vue-router'
+// 获取购物车相关逻辑
+const useCartEffect = () => {
+  const store = useStore()
+  const route = useRoute()
+  const shopId = route.params.id
+  const cartList = store.state.cartList
+  const total = computed(() => {
+    const productList = cartList[shopId]
+    let count = 0
+    if (productList) {
+      for (const i in productList) {
+        const product = productList[i]
+        count += product.count
+      }
+    }
+    return count
+  })
+  const price = computed(() => {
+    const productList = cartList[shopId]
+    let count = 0
+    if (productList) {
+      for (const i in productList) {
+        const product = productList[i]
+        count += (product.count * product.price)
+      }
+    }
+    return count.toFixed(2)
+  })
+  return { total, price }
+}
 export default {
+  name: 'Chat',
+  setup () {
+    const { total, price } = useCartEffect()
+    return { total, price }
+  }
 }
 </script>
 <style lang='scss' scoped>
@@ -40,16 +78,17 @@ export default {
     &__tag{
       position: absolute;
       top: .04rem;
-      right: .2rem;
-      width: .2rem;
+      left: .46rem;
+      min-width: .2rem;
       height: .2rem;
       line-height: .2rem;
-      border-radius: 50%;
+      border-radius: 0.1rem;
       font-size: .12rem;
       text-align: center;
       background-color: #e93b3b;
       color: #fff;
       transform: scale(.5);
+      transform-origin: left center;
     }
   }
   &__info{
