@@ -1,10 +1,16 @@
 <template>
   <div class="chat">
     <div class="product">
+      <div class="product__header"></div>
       <template
         v-for="item in productList"
         :key="item._id">
         <div v-if="item.count > 0" class="product__item">
+          <div
+            v-html="item.check ? '&#xe652;' : '&#xe6f7;'"
+            @click="() => chengeCartItemChecked(shopId, item._id)"
+            class="iconfont product__item__checked">
+          </div>
           <img class="product__item__img" :src="item.imgUrl" />
           <div class="product__item__detail">
             <h4 class="product__item__title">{{item.name}}</h4>
@@ -60,7 +66,9 @@ const useCartEffect = (shopId) => {
     if (productList) {
       for (const i in productList) {
         const product = productList[i]
-        count += (product.count * product.price)
+        if (product.check) {
+          count += (product.count * product.price)
+        }
       }
     }
     return count.toFixed(2)
@@ -69,15 +77,18 @@ const useCartEffect = (shopId) => {
     const productList = cartList[shopId] || []
     return productList
   })
-  return { total, price, productList, changeCartItemInfo }
+  const chengeCartItemChecked = (shopId, productId) => {
+    store.commit('changeCartItemChecked', { shopId, productId })
+  }
+  return { total, price, productList, changeCartItemInfo, chengeCartItemChecked }
 }
 export default {
   name: 'Chat',
   setup () {
     const route = useRoute()
     const shopId = route.params.id
-    const { total, price, productList, changeCartItemInfo } = useCartEffect(shopId)
-    return { total, price, shopId, productList, changeCartItemInfo }
+    const { total, price, productList, changeCartItemInfo, chengeCartItemChecked } = useCartEffect(shopId)
+    return { total, price, shopId, productList, changeCartItemInfo, chengeCartItemChecked }
   }
 }
 </script>
@@ -93,12 +104,22 @@ export default {
   flex: 1;
   overflow-y: scroll;
   background: #fff;
+  &__header{
+    height: .52rem;
+    border-bottom: 1px solid #F1F1F1;
+  }
   &__item{
     position: relative;
     display: flex;
     padding: .12rem 0;
     margin: 0 .16rem;
     border-bottom: .01rem solid #F1F1F1;
+    &__checked{
+      line-height: .5rem;
+      margin-right: .2rem;
+      font-size: .2rem;
+      color: #0091ff;
+    }
     &__img{
       width: .46rem;
       height: .46rem;
