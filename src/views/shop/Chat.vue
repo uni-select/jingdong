@@ -1,7 +1,13 @@
 <template>
   <div class="chat">
     <div class="product">
-      <div class="product__header"></div>
+      <div class="product__header">
+        <div class="product__header__all">
+          <span class="product__header__icon iconfont">&#xe6f7;</span>
+          全选
+        </div>
+        <div class="product__header__clear" @click="() => cleanCartProducts(shopId)">清空购物车</div>
+      </div>
       <template
         v-for="item in productList"
         :key="item._id">
@@ -80,15 +86,18 @@ const useCartEffect = (shopId) => {
   const chengeCartItemChecked = (shopId, productId) => {
     store.commit('changeCartItemChecked', { shopId, productId })
   }
-  return { total, price, productList, changeCartItemInfo, chengeCartItemChecked }
+  const cleanCartProducts = (shopId) => {
+    store.commit('cleanCartProducts', { shopId })
+  }
+  return { total, price, productList, changeCartItemInfo, chengeCartItemChecked, cleanCartProducts }
 }
 export default {
   name: 'Chat',
   setup () {
     const route = useRoute()
     const shopId = route.params.id
-    const { total, price, productList, changeCartItemInfo, chengeCartItemChecked } = useCartEffect(shopId)
-    return { total, price, shopId, productList, changeCartItemInfo, chengeCartItemChecked }
+    const { total, price, productList, changeCartItemInfo, chengeCartItemChecked, cleanCartProducts } = useCartEffect(shopId)
+    return { total, price, shopId, productList, changeCartItemInfo, chengeCartItemChecked, cleanCartProducts }
   }
 }
 </script>
@@ -106,7 +115,24 @@ export default {
   background: #fff;
   &__header{
     height: .52rem;
+    line-height: .52rem;
     border-bottom: 1px solid #F1F1F1;
+    display: flex;
+    font-size: .14rem;
+    color: #333;
+    &__all{
+      width: .64rem;
+      margin-left: .18rem;
+      &__icon{
+        font-size: .2rem;
+        color:#0091ff;
+      }
+    }
+    &__clear{
+      flex: 1;
+      margin-right: .18rem;
+      text-align: right;
+    }
   }
   &__item{
     position: relative;
