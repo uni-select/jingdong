@@ -1,9 +1,10 @@
 <template>
+  <div class="mask" v-if="showCart"></div>
   <div class="chat">
-    <div class="product">
+    <div class="product" v-if="showCart">
       <div class="product__header">
-        <div class="product__header__all">
-          <span class="product__header__icon iconfont">&#xe6f7;</span>
+        <div class="product__header__all" @click="() => setChatItemsChecked(shopId)">
+          <span class="product__header__icon iconfont" v-html="allChecked ? '&#xe652;' : '&#xe6f7;'"></span>
           全选
         </div>
         <div class="product__header__clear" @click="() => cleanCartProducts(shopId)">清空购物车</div>
@@ -36,7 +37,7 @@
     <div class="check">
       <div class="check__icon">
         <img src="http://www.dell-lee.com/imgs/vue3/basket.png" class="check__icon__img">
-        <div class="check__icon__tag">{{total}}</div>
+        <div class="check__icon__tag" @click="() => handleCartShowChange()">{{total}}</div>
       </div>
       <div class="check__info">
         总计：<span class="check__info__price">&yen; {{price}}</span>
@@ -46,7 +47,7 @@
   </div>
 </template>
 <script>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useStore } from 'vuex'
 import { useRoute } from 'vue-router'
 import { useCommonCartEffect } from './commonChatEffect'
@@ -79,6 +80,19 @@ const useCartEffect = (shopId) => {
     }
     return count.toFixed(2)
   })
+  const allChecked = computed(() => {
+    const productList = cartList[shopId]
+    let result = true
+    if (productList) {
+      for (const i in productList) {
+        const product = productList[i]
+        if (product.count > 0 && !product.check) {
+          result = false
+        }
+      }
+    }
+    return result
+  })
   const productList = computed(() => {
     const productList = cartList[shopId] || []
     return productList
@@ -89,25 +103,43 @@ const useCartEffect = (shopId) => {
   const cleanCartProducts = (shopId) => {
     store.commit('cleanCartProducts', { shopId })
   }
-  return { total, price, productList, changeCartItemInfo, chengeCartItemChecked, cleanCartProducts }
+  const setChatItemsChecked = (shopId) => {
+    store.commit('setChatItemsChecked', { shopId })
+  }
+  return { total, price, productList, allChecked, changeCartItemInfo, chengeCartItemChecked, cleanCartProducts, setChatItemsChecked }
 }
 export default {
   name: 'Chat',
   setup () {
     const route = useRoute()
     const shopId = route.params.id
-    const { total, price, productList, changeCartItemInfo, chengeCartItemChecked, cleanCartProducts } = useCartEffect(shopId)
-    return { total, price, shopId, productList, changeCartItemInfo, chengeCartItemChecked, cleanCartProducts }
+    const showCart = ref(false)
+    const handleCartShowChange = () => {
+      showCart.value = !showCart.value
+    }
+    const { total, price, productList, allChecked, changeCartItemInfo, chengeCartItemChecked, cleanCartProducts, setChatItemsChecked } = useCartEffect(shopId)
+    return { total, price, shopId, productList, allChecked, showCart, changeCartItemInfo, chengeCartItemChecked, cleanCartProducts, setChatItemsChecked, handleCartShowChange }
   }
 }
 </script>
 <style lang='scss' scoped>
 @import '@/style/mixins.scss';
+.mask{
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, .5);
+  z-index: 1;
+}
 .chat{
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
+  z-index: 2;
+  background: #fff;
 }
 .product{
   flex: 1;
@@ -123,10 +155,10 @@ export default {
     &__all{
       width: .64rem;
       margin-left: .18rem;
-      &__icon{
-        font-size: .2rem;
-        color:#0091ff;
-      }
+    }
+    &__icon{
+      font-size: .2rem;
+      color:#0091ff;
     }
     &__clear{
       flex: 1;

@@ -40,6 +40,16 @@ export default Vuex.createStore({
     cleanCartProducts (state, payload) {
       const { shopId } = payload
       state.cartList[shopId] = {}
+    },
+    setChatItemsChecked (state, payload) {
+      const { shopId } = payload
+      const products = state.cartList[shopId]
+      if (products) {
+        for (const key in products) {
+          const product = products[key]
+          product.check = true
+        }
+      }
     }
   },
   actions: {
